@@ -35,53 +35,45 @@ function reloadPuzzle () {
   allDoneElement.classList.toggle('allDone')
 }
 
-// Mobile functionality
+// mobile functionality
 var puzzleItemsMobile = document.querySelectorAll('#puzz i')
-
-var touchStartX = 0
-var touchStartY = 0
-
-var puzzleCompleted = false // Add this variable to track completion
-
 puzzleItemsMobile.forEach(function (element) {
-  element.addEventListener('touchstart', function (e) {
-    e.preventDefault()
-    if (puzzleCompleted) return // Don't allow interactions if puzzle is completed
-
+  element.addEventListener('mousedown', function () {
     totalClicks++
     document.querySelector('#clicks').innerHTML = totalClicks
-    touchStartX = e.touches[0].clientX
-    touchStartY = e.touches[0].clientY
   })
-
-  element.addEventListener('touchend', function (e) {
-    if (puzzleCompleted) return // Don't allow interactions if puzzle is completed
-
-    var touchEndX = e.changedTouches[0].clientX
-    var touchEndY = e.changedTouches[0].clientY
-    var touchDistanceX = touchEndX - touchStartX
-    var touchDistanceY = touchEndY - touchStartY
-
-    if (Math.abs(touchDistanceX) < 10 && Math.abs(touchDistanceY) < 10) {
-      if (document.querySelector('.clicked')) {
-        document.querySelector('.clicked').classList.toggle('clicked')
-        element.classList.toggle('clicked')
-      } else {
-        element.classList.toggle('clicked')
-      }
+  element.addEventListener('click', function () {
+    if (document.querySelector('.clicked')) {
+      document.querySelector('.clicked').classList.toggle('clicked')
+      element.classList.toggle('clicked')
+    } else {
+      element.classList.toggle('clicked')
     }
+  })
+})
 
-    if (
-      document.querySelectorAll('.dropped').length === 9 &&
-      !puzzleCompleted
-    ) {
-      puzzleCompleted = true // Set the puzzle as completed
+var puzzleItemsDesktop = document.querySelectorAll('#puz i')
+puzzleItemsDesktop.forEach(function (element) {
+  element.addEventListener('click', function () {
+    if (document.querySelector('.clicked')) {
+      var clickedElement = document.querySelector('.clicked')
+      if (clickedElement.classList.contains(element.classList)) {
+        element.classList.add('dropped')
+        clickedElement.classList.add('done')
+        clickedElement.classList.toggle('clicked')
 
-      setTimeout(function () {
-        reloadPuzzle()
-        randomizeImage()
-        puzzleCompleted = false // Reset the puzzle completion after 9 seconds
-      }, 9000) // 9000 milliseconds = 9 seconds
+        if (document.querySelectorAll('.dropped').length == 9) {
+          document.querySelector('#puz').classList.add('allDone')
+          document.querySelector('#puz').style.border = 'none'
+          document.querySelector('#puz').style.animation =
+            'allDone 1s linear forwards'
+
+          setTimeout(function () {
+            reloadPuzzle()
+            randomizeImage()
+          }, 9000)
+        }
+      }
     }
   })
 })
@@ -115,7 +107,7 @@ function drop (ev) {
       setTimeout(function () {
         reloadPuzzle()
         randomizeImage()
-      }, 1500)
+      }, 9000)
     }
   }
 }
