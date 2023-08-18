@@ -41,12 +41,12 @@ var puzzleItemsMobile = document.querySelectorAll('#puzz i')
 var touchStartX = 0
 var touchStartY = 0
 
-var puzzleCompleted = false // Add this variable to track completion
+var puzzleCompletedMobile = false // Add this variable to track completion
 
 puzzleItemsMobile.forEach(function (element) {
   element.addEventListener('touchstart', function (e) {
     e.preventDefault()
-    if (puzzleCompleted) return // Don't allow interactions if puzzle is completed
+    if (puzzleCompletedMobile) return // Don't allow interactions if puzzle is completed
 
     totalClicks++
     document.querySelector('#clicks').innerHTML = totalClicks
@@ -55,7 +55,7 @@ puzzleItemsMobile.forEach(function (element) {
   })
 
   element.addEventListener('touchend', function (e) {
-    if (puzzleCompleted) return // Don't allow interactions if puzzle is completed
+    if (puzzleCompletedMobile) return // Don't allow interactions if puzzle is completed
 
     var touchEndX = e.changedTouches[0].clientX
     var touchEndY = e.changedTouches[0].clientY
@@ -69,6 +69,19 @@ puzzleItemsMobile.forEach(function (element) {
       } else {
         element.classList.toggle('clicked')
       }
+    }
+
+    if (
+      document.querySelectorAll('.dropped').length === 9 &&
+      !puzzleCompletedMobile
+    ) {
+      puzzleCompletedMobile = true // Set the puzzle as completed
+
+      setTimeout(function () {
+        reloadPuzzle()
+        randomizeImage()
+        puzzleCompletedMobile = false // Reset the puzzle completion after 9 seconds
+      }, 9000) // 9000 milliseconds = 9 seconds
     }
   })
 })
