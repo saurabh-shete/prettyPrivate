@@ -41,12 +41,12 @@ var puzzleItemsMobile = document.querySelectorAll('#puzz i')
 var touchStartX = 0
 var touchStartY = 0
 
-var puzzleCompletedMobile = false // Add this variable to track completion
+var puzzleCompleted = false // Add this variable to track completion
 
 puzzleItemsMobile.forEach(function (element) {
   element.addEventListener('touchstart', function (e) {
     e.preventDefault()
-    if (puzzleCompletedMobile) return // Don't allow interactions if puzzle is completed
+    if (puzzleCompleted) return // Don't allow interactions if puzzle is completed
 
     totalClicks++
     document.querySelector('#clicks').innerHTML = totalClicks
@@ -55,7 +55,7 @@ puzzleItemsMobile.forEach(function (element) {
   })
 
   element.addEventListener('touchend', function (e) {
-    if (puzzleCompletedMobile) return // Don't allow interactions if puzzle is completed
+    if (puzzleCompleted) return // Don't allow interactions if puzzle is completed
 
     var touchEndX = e.changedTouches[0].clientX
     var touchEndY = e.changedTouches[0].clientY
@@ -73,14 +73,14 @@ puzzleItemsMobile.forEach(function (element) {
 
     if (
       document.querySelectorAll('.dropped').length === 9 &&
-      !puzzleCompletedMobile
+      !puzzleCompleted
     ) {
-      puzzleCompletedMobile = true // Set the puzzle as completed
+      puzzleCompleted = true // Set the puzzle as completed
 
       setTimeout(function () {
         reloadPuzzle()
         randomizeImage()
-        puzzleCompletedMobile = false // Reset the puzzle completion after 9 seconds
+        puzzleCompleted = false // Reset the puzzle completion after 9 seconds
       }, 9000) // 9000 milliseconds = 9 seconds
     }
   })
@@ -88,9 +88,6 @@ puzzleItemsMobile.forEach(function (element) {
 
 // ...
 
-var puzzleCompleted = false // Add this variable to track completion
-
-// desktop drag and drop
 function allowDrop (ev) {
   ev.preventDefault()
 }
@@ -101,8 +98,6 @@ function drag (ev) {
 
 function drop (ev) {
   ev.preventDefault()
-  if (puzzleCompleted) return // Don't allow drops if puzzle is completed
-
   var data = ev.dataTransfer.getData('text')
 
   if (ev.target.className == data) {
@@ -117,13 +112,10 @@ function drop (ev) {
       document.querySelector('#puz').style.animation =
         'allDone 1s linear forwards'
 
-      puzzleCompleted = true // Set the puzzle as completed
-
       setTimeout(function () {
         reloadPuzzle()
         randomizeImage()
-        puzzleCompleted = false // Reset the puzzle completion after 9 seconds
-      }, 9000) // 9000 milliseconds = 9 seconds
+      }, 1500)
     }
   }
 }
