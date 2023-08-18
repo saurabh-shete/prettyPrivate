@@ -35,48 +35,47 @@ function reloadPuzzle () {
   allDoneElement.classList.toggle('allDone')
 }
 
-// mobile functionality
+// Mobile functionality
 var puzzleItemsMobile = document.querySelectorAll('#puzz i')
+
+var touchStartX = 0
+var touchStartY = 0
+
+var puzzleCompleted = false // Add this variable to track completion
+
 puzzleItemsMobile.forEach(function (element) {
-  element.addEventListener('mousedown', function () {
+  element.addEventListener('touchstart', function (e) {
+    e.preventDefault()
+    if (puzzleCompleted) return // Don't allow interactions if puzzle is completed
+
     totalClicks++
     document.querySelector('#clicks').innerHTML = totalClicks
+    touchStartX = e.touches[0].clientX
+    touchStartY = e.touches[0].clientY
   })
-  element.addEventListener('click', function () {
-    if (document.querySelector('.clicked')) {
-      document.querySelector('.clicked').classList.toggle('clicked')
-      element.classList.toggle('clicked')
-    } else {
-      element.classList.toggle('clicked')
-    }
-  })
-})
 
-var puzzleItemsDesktop = document.querySelectorAll('#puz i')
-puzzleItemsDesktop.forEach(function (element) {
-  element.addEventListener('click', function () {
-    if (document.querySelector('.clicked')) {
-      var clickedElement = document.querySelector('.clicked')
-      if (clickedElement.classList.contains(element.classList)) {
-        element.classList.add('dropped')
-        clickedElement.classList.add('done')
-        clickedElement.classList.toggle('clicked')
+  element.addEventListener('touchend', function (e) {
+    if (puzzleCompleted) return // Don't allow interactions if puzzle is completed
 
-        if (document.querySelectorAll('.dropped').length == 9) {
-          document.querySelector('#puz').classList.add('allDone')
-          document.querySelector('#puz').style.border = 'none'
-          document.querySelector('#puz').style.animation =
-            'allDone 1s linear forwards'
+    var touchEndX = e.changedTouches[0].clientX
+    var touchEndY = e.changedTouches[0].clientY
+    var touchDistanceX = touchEndX - touchStartX
+    var touchDistanceY = touchEndY - touchStartY
 
-          setTimeout(function () {
-            reloadPuzzle()
-            randomizeImage()
-          }, 1500)
-        }
+    if (Math.abs(touchDistanceX) < 10 && Math.abs(touchDistanceY) < 10) {
+      if (document.querySelector('.clicked')) {
+        document.querySelector('.clicked').classList.toggle('clicked')
+        element.classList.toggle('clicked')
+      } else {
+        element.classList.toggle('clicked')
       }
     }
   })
 })
+
+// ...
+
+var puzzleCompleted = false // Add this variable to track completion
 
 // desktop drag and drop
 function allowDrop (ev) {
@@ -89,6 +88,8 @@ function drag (ev) {
 
 function drop (ev) {
   ev.preventDefault()
+  if (puzzleCompleted) return // Don't allow drops if puzzle is completed
+
   var data = ev.dataTransfer.getData('text')
 
   if (ev.target.className == data) {
@@ -103,10 +104,13 @@ function drop (ev) {
       document.querySelector('#puz').style.animation =
         'allDone 1s linear forwards'
 
+      puzzleCompleted = true // Set the puzzle as completed
+
       setTimeout(function () {
         reloadPuzzle()
         randomizeImage()
-      }, 1500)
+        puzzleCompleted = false // Reset the puzzle completion after 9 seconds
+      }, 9000) // 9000 milliseconds = 9 seconds
     }
   }
 }
